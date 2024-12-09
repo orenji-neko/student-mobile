@@ -4,6 +4,7 @@ import { BarcodeScanningResult, CameraType, CameraView, useCameraPermissions } f
 import { useNavigation } from "@react-navigation/native";
 import { FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import Button from "@/components/Button";
 
 const Scan = () => {
   const [facing, setFacing] = useState<CameraType>("back");
@@ -52,6 +53,11 @@ const Scan = () => {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>No access to camera</Text>
+        <Button
+          onPress={ () => requestPermission() }
+        >
+          <Text style={{ color: "white" }}> Grant Permissions </Text>
+        </Button>
       </View>
     );
   }
