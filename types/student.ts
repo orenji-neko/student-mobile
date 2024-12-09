@@ -1,10 +1,10 @@
 
 type StudentType = {
-  idno: string,
+  idno: number,
   lastname: string,
   firstname: string,
   course: string,
-  level: string
+  level: number
 }
 
 export default StudentType;

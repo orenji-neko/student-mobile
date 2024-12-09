@@ -1,19 +1,41 @@
 import { View, Text, Pressable, ScrollView } from "react-native";
-import { useRouter } from "expo-router";
+import { useGlobalSearchParams, useRouter } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
 import TextInput from "@/components/TextInput";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StudentType } from "@/types";
 import Button from "@/components/Button";
+import { useStudentContext } from "@/api/Student";
 
 const Manage = () => {
-  const [student, setStudent] = useState<StudentType>({
-    idno: "",
-    lastname: "",
-    firstname: "",
-    course: "",
-    level: ""
+  const { operation, idno, lastname, firstname, course, level } = useGlobalSearchParams<{
+    operation: string,
+    idno: string,
+    lastname: string,
+    firstname: string,
+    course: string,
+    level: string
+  }>();
+
+  // apis
+  const studentApi = useStudentContext();
+
+  const [title, setTitle] = useState<string>("Manage Student");
+  
+  const [student, setStudent] = useState<{
+    idno: string,
+    lastname: string,
+    firstname: string,
+    course: string,
+    level: string
+  }>({
+    idno: idno ? idno : "",
+    lastname: lastname ? lastname : "",
+    firstname: firstname ? firstname: "",
+    course: course ? course : "",
+    level: level ? level : ""
   });
+
   const [errors, setErrors] = useState<{
     idno: boolean,
     lastname: boolean,
@@ -26,7 +48,7 @@ const Manage = () => {
     firstname: false,
     course: false,
     level: false
-  })
+  });
 
   const router = useRouter();
 
@@ -58,6 +80,28 @@ const Manage = () => {
       setErrors(prev => ({...prev, level: true}));
       return;
     }
+
+    if(operation === "edit") {
+      studentApi.put({
+        idno: parseInt(idno),
+        lastname: lastname,
+        firstname: firstname,
+        course: course,
+        level: parseInt(level)
+      })
+    }
+    else {
+      // add student
+      studentApi.post({
+        idno: parseInt(idno),
+        lastname: lastname,
+        firstname: firstname,
+        course: course,
+        level: parseInt(level)
+      })
+    }
+
+    router.push("/(admin)/(students)");
   }
 
   return (
@@ -88,7 +132,7 @@ const Manage = () => {
             fontWeight: "bold"
           }}
         >
-          Add Student
+          {title}
         </Text>
       </View>
         
@@ -103,6 +147,7 @@ const Manage = () => {
         <TextInput
           value={student.idno}
           onChangeText={(txt) => setStudent(p => ({...p, idno: txt}))}
+          readonly={operation === "edit"}
           keyboardType="number-pad"
           error={errors.idno}
           errorMessage="Invalid ID No."
