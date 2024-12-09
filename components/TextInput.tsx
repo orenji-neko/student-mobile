@@ -7,7 +7,8 @@ type TextInputType = {
   style?: ViewStyle | ViewStyle[],
   placeholder?: string,
   error?: boolean,
-  errorMessage?: string
+  errorMessage?: string,
+  readonly?: boolean,
 }
 
 export default ({ 
@@ -17,7 +18,8 @@ export default ({
   onChangeText, 
   style, 
   error = false,
-  errorMessage = "Error"
+  errorMessage = "Error",
+  readonly = false,
 }: TextInputType) => {
 
   return (
@@ -25,18 +27,26 @@ export default ({
       <TextInput
           keyboardType={keyboardType}
           placeholder={placeholder}
-          editable
+          readOnly={readonly}
+          editable={readonly}
           onChangeText={txt => onChangeText && onChangeText(txt)}
           value={value}
-          style={{
-            padding: 10,
-            borderColor: "grey",
-            backgroundColor: "white",
-            borderBottomWidth: 2
-          }}
+          style={
+            [{
+              padding: 10,
+              borderColor: "grey",
+              backgroundColor: "white",
+              borderBottomWidth: 2
+            },
+            readonly ? {
+              color: "gray"
+            } : {
+              color: "black"
+            }]
+          }
         />
       { error && (
-        <Text style={{ color: "red" }} >{ errorMessage }</Text>
+        <Text style={{ color:  "red" }} >{ errorMessage }</Text>
       )}
     </View>
   )

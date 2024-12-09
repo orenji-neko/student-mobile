@@ -1,23 +1,42 @@
-import { Text, View, ScrollView, Pressable } from "react-native";
+import { Text, View, ScrollView, Pressable, TouchableOpacity } from "react-native";
 import Card from "@/components/Card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-
-const dummy = Array.from({ length: 1}, (_v, index) => ({
-  id: index + 1000,
-  lastname: "Doe",
-  firstname: "John",
-  course: "BSIT",
-  level: 3
-}))
+import { useStudentContext } from "@/api/Student";
+import { StudentType } from "@/types";
 
 const Students = () => {
-  const [ students, setStudents ] = useState([...dummy])
+  const [ students, setStudents ] = useState<StudentType[]>()
   const router = useRouter();
+
+  // apis
+  const studentApi = useStudentContext();
 
   const addHandler = () => {
     router.push("/(admin)/(students)/manage");
+  }
+
+  useEffect(() => {
+
+    const fetchIntervalId = setInterval(async () => {
+      setStudents(await studentApi.get());
+    }, 1000);
+
+  }, []);
+
+  const viewStudentDetail = (student: StudentType) => {
+    router.push({
+      pathname: "/(admin)/(students)/detail",
+      params: { 
+        ops:        "edit",
+        idno:       student.idno,
+        lastname:   student.lastname,
+        firstname:  student.firstname,
+        course:     student.course,
+        level:      student.level
+      }
+    });
   }
 
   return (
@@ -41,13 +60,13 @@ const Students = () => {
         {
           students && students.map((student, index) => (
             // student info
-            <Pressable key={index}>
+            <TouchableOpacity key={index} onPress={() => viewStudentDetail(student) }>
               <Card layout="horizontal" style={{ borderRadius: 30, width: "100%" }}>
                 <Ionicons name="person" size={20}/>
-                <Text> {student.id} </Text>
+                <Text> {student.idno} </Text>
                 <Text> {student.lastname}, {student.firstname} </Text>
               </Card>
-            </Pressable>
+            </TouchableOpacity>
           ))
         }
       </ScrollView>

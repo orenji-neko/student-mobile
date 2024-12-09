@@ -12,6 +12,9 @@ const Layout = () => {
       <Stack.Screen
         name="manage"
       />
+      <Stack.Screen
+        name="detail"
+      />
     </Stack>
   )
 }
